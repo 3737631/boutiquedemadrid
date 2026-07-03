@@ -327,6 +327,19 @@
         .order-fields input:focus, .order-fields textarea:focus { border-color: #fff; }
         .order-fields textarea { min-height: 60px; resize: vertical; }
 
+        .size-selector { margin: 1.2rem 0; }
+        .size-selector label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #555; display: block; margin-bottom: 0.6rem; }
+        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .size-options input[type="radio"] { display: none; }
+        .size-options label {
+            display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+            border: 1px solid #333; border-radius: 50%; cursor: pointer; font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace; color: #888; transition: all 0.2s;
+            text-transform: uppercase; user-select: none;
+        }
+        .size-options input[type="radio"]:checked + label { border-color: #fff; color: #fff; background: rgba(255,255,255,0.1); }
+        .size-options label:hover { border-color: #666; color: #ccc; }
+
         .add-extra-toggle {
             background: none; border: 1px solid #333; color: #888; padding: 0.5rem 1rem; border-radius: 50px;
             font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; font-family: inherit;
@@ -500,7 +513,7 @@
                 <h4>COMO HACER TU PEDIDO</h4>
                 <div class="info-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                    <div><span class="title">PEDIDO FACIL</span><span class="desc">ANYADE AL CARRITO, REVISA Y CONFIRMA. TE ENVIAMOS CONFIRMACION AL MOMENTO.</span></div>
+                    <div><span class="title">PEDIDO FACIL</span><span class="desc">AÑADE AL CARRITO, REVISA Y CONFIRMA. TE ENVIAMOS CONFIRMACION AL MOMENTO.</span></div>
                 </div>
                 <div class="info-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -556,7 +569,7 @@
                 </div>
 
                 <div class="cart-rows" id="orderCartItems">
-                    <div class="cart-empty-txt">No hay productos anadidos.</div>
+                    <div class="cart-empty-txt">No hay productos añadidos.</div>
                 </div>
                 <div class="cart-total-row" id="orderTotalRow" style="display:none;">
                     <span>TOTAL</span>
@@ -568,19 +581,36 @@
                         <label>Tu nombre</label>
                         <input type="text" id="customerName" placeholder="Ej: Maria Garcia">
                     </div>
+                    <div class="size-selector">
+                        <label>Selecciona tu talla</label>
+                        <div class="size-options">
+                            <input type="radio" name="talla" id="tallaXS" value="XS">
+                            <label for="tallaXS">XS</label>
+                            <input type="radio" name="talla" id="tallaS" value="S">
+                            <label for="tallaS">S</label>
+                            <input type="radio" name="talla" id="tallaM" value="M" checked>
+                            <label for="tallaM">M</label>
+                            <input type="radio" name="talla" id="tallaL" value="L">
+                            <label for="tallaL">L</label>
+                            <input type="radio" name="talla" id="tallaXL" value="XL">
+                            <label for="tallaXL">XL</label>
+                            <input type="radio" name="talla" id="tallaXXL" value="XXL">
+                            <label for="tallaXXL">XXL</label>
+                        </div>
+                    </div>
                     <div>
                         <label>Notas del pedido (opcional)</label>
-                        <textarea id="orderNotes" placeholder="Tallas, colores, observaciones..."></textarea>
+                        <textarea id="orderNotes" placeholder="Colores, observaciones..."></textarea>
                     </div>
                 </div>
 
-                <button class="add-extra-toggle" onclick="toggleExtra()">+ Anyadir producto del catalogo</button>
+                <button class="add-extra-toggle" onclick="toggleExtra()">+ Añadir producto del catalogo</button>
                 <div class="extra-form" id="extraForm">
                     <div class="ef-row">
                         <input type="text" id="efNum" placeholder="Nº">
                         <input type="text" id="efName" placeholder="Nombre del producto">
                         <input type="text" id="efPrice" placeholder="Precio">
-                        <button onclick="addExtra()">Anyadir</button>
+                        <button onclick="addExtra()">Añadir</button>
                     </div>
                 </div>
 
@@ -597,7 +627,7 @@
             <h4>INFORMACION DE PEDIDOS</h4>
             <div class="info-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                <div><span class="title">PEDIDO FACIL</span><span class="desc">ANYADE AL CARRITO Y CONFIRMA</span></div>
+                <div><span class="title">PEDIDO FACIL</span><span class="desc">AÑADE AL CARRITO Y CONFIRMA</span></div>
             </div>
             <div class="info-item">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
@@ -670,10 +700,11 @@ let currentCategory = "ALL";
 
     function settle() {
         el2.style.display = "none";
-        el1.innerHTML = "BOUTIQUE<br>DE TENDENCIA";
+        el1.textContent = "BOUTIQUE DE TENDENCIA";
         el1.style.filter = "none";
         el1.style.opacity = "1";
         gooWrap.style.filter = "none";
+        el1.style.transform = "translateX(0)";
     }
 
     el1.textContent = texts[0];
@@ -695,7 +726,7 @@ function renderCarousel() {
     if (!track) return;
     let html = '';
     for (let r = 0; r < 3; r++) PRODUCTS.forEach(function(p) {
-        html += '<div class="carousel-item"><div class="img-frame"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy" onclick="openModal(\'' + p.image + '\')"></div><div class="label"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><span class="add-small" onclick="event.stopPropagation();addToCart(\'' + p.name + '\',' + p.price + ')">[ + Anyadir ]</span></div>';
+        html += '<div class="carousel-item"><div class="img-frame"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy" onclick="openModal(\'' + p.image + '\')"></div><div class="label"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><span class="add-small" onclick="event.stopPropagation();addToCart(\'' + p.name + '\',' + p.price + ')">[ + Añadir ]</span></div>';
     });
     track.innerHTML = html;
 }
@@ -706,7 +737,7 @@ function renderCatalog(category) {
     const filtered = category === 'ALL' ? PRODUCTS : PRODUCTS.filter(function(p) { return p.category === category; });
     if (filtered.length === 0) { grid.innerHTML = '<div class="empty-msg">No hay productos en esta categoria.</div>'; return; }
     grid.innerHTML = filtered.map(function(p) {
-        return '<div class="product-card item"><div class="info"><div class="name-row"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><div class="brand">' + p.code + '</div></div><div class="img-wrap" onclick="openModal(\'' + p.image + '\')"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy"></div><span class="padd-small" onclick="event.stopPropagation();addToCart(\'' + p.name + '\',' + p.price + ')">+ Anyadir</span></div>';
+        return '<div class="product-card item"><div class="info"><div class="name-row"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><div class="brand">' + p.code + '</div></div><div class="img-wrap" onclick="openModal(\'' + p.image + '\')"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy"></div><span class="padd-small" onclick="event.stopPropagation();addToCart(\'' + p.name + '\',' + p.price + ')">+ Añadir</span></div>';
     }).join('');
 }
 
@@ -787,7 +818,7 @@ function addToCart(name, price) {
     const existing = cart.find(function(i) { return i.name === name; });
     if (existing) { existing.qty += 1; } else { cart.push({ name: name, price: price, qty: 1 }); }
     saveCart(cart);
-    showToast('Anyadido: ' + name);
+    showToast('Añadido: ' + name);
 }
 
 function updateQty(name, delta) {
@@ -828,7 +859,7 @@ function updateOrderCartUI() {
     const container = document.getElementById('orderCartItems');
     const totalRow = document.getElementById('orderTotalRow');
     if (cart.length === 0) {
-        container.innerHTML = '<div class="cart-empty-txt">No hay productos anadidos.</div>';
+        container.innerHTML = '<div class="cart-empty-txt">No hay productos añadidos.</div>';
         totalRow.style.display = 'none';
         return;
     }
@@ -901,11 +932,15 @@ function sendWA() {
     const cart = getCart();
     const name = document.getElementById('customerName').value.trim();
     const notes = document.getElementById('orderNotes').value.trim();
-    if (cart.length === 0) { showToast('Anyade productos al carrito'); return; }
+    if (cart.length === 0) { showToast('Añade productos al carrito'); return; }
     if (!name) { showToast('Introduce tu nombre'); return; }
+
+    const talla = document.querySelector('input[name="talla"]:checked');
+    const tallaVal = talla ? talla.value : '';
 
     let msg = '*NUEVO PEDIDO - Boutique de Tendencia*\n\n';
     msg += '*Cliente:* ' + name + '\n';
+    if (tallaVal) msg += '*Talla:* ' + tallaVal + '\n';
     if (notes) msg += '*Notas:* ' + notes + '\n';
     msg += '\n*Productos:*\n';
     let total = 0;
@@ -1019,7 +1054,7 @@ function searchProducts(query) {
     const container = document.getElementById('orderCartItems');
     const quickDiv = document.createElement('div');
     quickDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:0.8rem 0 0.5rem;border-top:1px solid rgba(255,255,255,0.06);';
-    quickDiv.innerHTML = '<div style="width:100%;font-size:0.55rem;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.4rem;">Anyadir rapido:</div>';
+    quickDiv.innerHTML = '<div style="width:100%;font-size:0.55rem;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.4rem;">Añadir rapido:</div>';
     quickProducts.forEach(function(p) {
         const btn = document.createElement('button');
         btn.textContent = p.name + ' ' + p.price + 'EUR';
