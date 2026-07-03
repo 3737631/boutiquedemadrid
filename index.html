@@ -327,18 +327,15 @@
         .order-fields input:focus, .order-fields textarea:focus { border-color: #fff; }
         .order-fields textarea { min-height: 60px; resize: vertical; }
 
-        .size-selector { margin: 1.2rem 0; }
-        .size-selector label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: #555; display: block; margin-bottom: 0.6rem; }
-        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
-        .size-options input[type="radio"] { display: none; }
-        .size-options label {
-            display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;
-            border: 1px solid #333; border-radius: 50%; cursor: pointer; font-size: 0.7rem;
-            font-family: 'JetBrains Mono', monospace; color: #888; transition: all 0.2s;
-            text-transform: uppercase; user-select: none;
+        .sz-picker { display: inline-flex; gap: 3px; align-items: center; vertical-align: middle; }
+        .sz-picker .szc {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border-radius: 50%; border: 1px solid #444;
+            font-size: 0.45rem; cursor: pointer; color: #666; transition: all 0.2s;
+            font-family: 'JetBrains Mono', monospace; user-select: none; line-height: 1; padding: 0;
         }
-        .size-options input[type="radio"]:checked + label { border-color: #fff; color: #fff; background: rgba(255,255,255,0.1); }
-        .size-options label:hover { border-color: #666; color: #ccc; }
+        .sz-picker .szc:hover { border-color: #888; color: #aaa; }
+        .sz-picker .szc.active { border-color: #fff; color: #fff; background: rgba(255,255,255,0.15); }
 
         .add-extra-toggle {
             background: none; border: 1px solid #333; color: #888; padding: 0.5rem 1rem; border-radius: 50px;
@@ -349,7 +346,7 @@
 
         .extra-form { display: none; flex-direction: column; gap: 0.5rem; padding: 1rem; background: #0d0d0d; border-radius: 12px; margin-top: 0.3rem; }
         .extra-form.show { display: flex; }
-        .extra-form .ef-row { display: grid; grid-template-columns: 1fr 2fr 1fr auto; gap: 8px; align-items: center; }
+        .extra-form .ef-row { display: grid; grid-template-columns: 1fr 2fr auto 1fr auto; gap: 8px; align-items: center; }
         .extra-form input { padding: 0.5rem; border: 1px solid #333; background: transparent; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.75rem; outline: none; border-radius: 8px; }
         .extra-form input:focus { border-color: #fff; }
         .extra-form button { background: #fff; color: #000; border: none; padding: 0.5rem 0.8rem; border-radius: 8px; font-size: 0.65rem; cursor: pointer; font-weight: 600; font-family: inherit; }
@@ -581,23 +578,6 @@
                         <label>Tu nombre</label>
                         <input type="text" id="customerName" placeholder="Ej: Maria Garcia">
                     </div>
-                    <div class="size-selector">
-                        <label>Selecciona tu talla</label>
-                        <div class="size-options">
-                            <input type="radio" name="talla" id="tallaXS" value="XS">
-                            <label for="tallaXS">XS</label>
-                            <input type="radio" name="talla" id="tallaS" value="S">
-                            <label for="tallaS">S</label>
-                            <input type="radio" name="talla" id="tallaM" value="M" checked>
-                            <label for="tallaM">M</label>
-                            <input type="radio" name="talla" id="tallaL" value="L">
-                            <label for="tallaL">L</label>
-                            <input type="radio" name="talla" id="tallaXL" value="XL">
-                            <label for="tallaXL">XL</label>
-                            <input type="radio" name="talla" id="tallaXXL" value="XXL">
-                            <label for="tallaXXL">XXL</label>
-                        </div>
-                    </div>
                     <div>
                         <label>Notas del pedido (opcional)</label>
                         <textarea id="orderNotes" placeholder="Colores, observaciones..."></textarea>
@@ -608,7 +588,15 @@
                 <div class="extra-form" id="extraForm">
                     <div class="ef-row">
                         <input type="text" id="efNum" placeholder="Nº">
-                        <input type="text" id="efName" placeholder="Nombre del producto">
+                        <input type="text" id="efName" placeholder="Nombre">
+                        <span class="sz-picker" id="efSizePicker">
+                            <span class="szc active" onclick="pickSize('__extra__','XS',this)">XS</span>
+                            <span class="szc" onclick="pickSize('__extra__','S',this)">S</span>
+                            <span class="szc" onclick="pickSize('__extra__','M',this)">M</span>
+                            <span class="szc" onclick="pickSize('__extra__','L',this)">L</span>
+                            <span class="szc" onclick="pickSize('__extra__','XL',this)">XL</span>
+                            <span class="szc" onclick="pickSize('__extra__','XXL',this)">XXL</span>
+                        </span>
                         <input type="text" id="efPrice" placeholder="Precio">
                         <button onclick="addExtra()">Añadir</button>
                     </div>
@@ -724,9 +712,13 @@ let currentCategory = "ALL";
 function renderCarousel() {
     const track = document.getElementById('carouselTrack');
     if (!track) return;
+    var SIZES = ["XS","S","M","L","XL","XXL"];
     let html = '';
     for (let r = 0; r < 3; r++) PRODUCTS.forEach(function(p) {
-        html += '<div class="carousel-item"><div class="img-frame"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy" onclick="openModal(\'' + p.image + '\')"></div><div class="label"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><span class="add-small" onclick="event.stopPropagation();addToCart(\'' + p.name + '\',' + p.price + ')">[ + Añadir ]</span></div>';
+        var szHtml = '<span class="sz-picker">';
+        SIZES.forEach(function(s) { szHtml += '<span class="szc' + (s === 'M' ? ' active' : '') + '" onclick="pickSize(\'' + p.name.replace(/'/g, "\\'") + '\',\'' + s + '\',this)">' + s + '</span>'; });
+        szHtml += '</span>';
+        html += '<div class="carousel-item"><div class="img-frame"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy" onclick="openModal(\'' + p.image + '\')"></div><div class="label"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><div style="display:flex;align-items:center;gap:6px;margin-top:4px;">' + szHtml + '<span class="add-small" onclick="event.stopPropagation();addWithSize(this,\'' + p.name.replace(/'/g, "\\'") + '\',' + p.price + ')">[ + Añadir ]</span></div></div>';
     });
     track.innerHTML = html;
 }
@@ -736,8 +728,12 @@ function renderCatalog(category) {
     const grid = document.getElementById('catalogGrid');
     const filtered = category === 'ALL' ? PRODUCTS : PRODUCTS.filter(function(p) { return p.category === category; });
     if (filtered.length === 0) { grid.innerHTML = '<div class="empty-msg">No hay productos en esta categoria.</div>'; return; }
+    var SIZES2 = ["XS","S","M","L","XL","XXL"];
     grid.innerHTML = filtered.map(function(p) {
-        return '<div class="product-card item"><div class="info"><div class="name-row"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><div class="brand">' + p.code + '</div></div><div class="img-wrap" onclick="openModal(\'' + p.image + '\')"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy"></div><span class="padd-small" onclick="event.stopPropagation();addToCart(\'' + p.name + '\',' + p.price + ')">+ Añadir</span></div>';
+        var szHtml = '<span class="sz-picker">';
+        SIZES2.forEach(function(s) { szHtml += '<span class="szc' + (s === 'M' ? ' active' : '') + '" onclick="pickSize(\'' + p.name.replace(/'/g, "\\'") + '\',\'' + s + '\',this)">' + s + '</span>'; });
+        szHtml += '</span>';
+        return '<div class="product-card item"><div class="info"><div class="name-row"><span class="name">' + p.name + '</span><span class="price">' + p.price + ' EUR</span></div><div class="brand">' + p.code + '</div><div style="margin-top:4px;">' + szHtml + '</div></div><div class="img-wrap" onclick="openModal(\'' + p.image + '\')"><img src="' + p.image + '" alt="' + p.name + '" loading="lazy"></div><span class="padd-small" onclick="event.stopPropagation();addWithSize(this,\'' + p.name.replace(/'/g, "\\'") + '\',' + p.price + ')">+ Añadir</span></div>';
     }).join('');
 }
 
@@ -813,27 +809,47 @@ function showToast(text) {
 function getCart() { return JSON.parse(localStorage.getItem('bt_cart') || '[]'); }
 function saveCart(cart) { localStorage.setItem('bt_cart', JSON.stringify(cart)); updateCartUI(); updateOrderCartUI(); }
 
-function addToCart(name, price) {
+function addToCart(name, price, size) {
+    size = size || 'M';
     let cart = getCart();
-    const existing = cart.find(function(i) { return i.name === name; });
-    if (existing) { existing.qty += 1; } else { cart.push({ name: name, price: price, qty: 1 }); }
+    const key = name + '||' + size;
+    const existing = cart.find(function(i) { return (i.name + '||' + (i.size || 'M')) === key; });
+    if (existing) { existing.qty += 1; } else { cart.push({ name: name, price: price, size: size, qty: 1 }); }
     saveCart(cart);
-    showToast('Añadido: ' + name);
+    showToast('Añadido: ' + name + ' (' + size + ')');
 }
 
-function updateQty(name, delta) {
+function pickSize(name, size, el) {
+    var picker = el.parentElement;
+    picker.querySelectorAll('.szc').forEach(function(s) { s.classList.remove('active'); });
+    el.classList.add('active');
+}
+
+function addWithSize(btn, name, price) {
+    var picker = btn.parentElement.querySelector('.sz-picker');
+    var size = 'M';
+    if (picker) {
+        var active = picker.querySelector('.szc.active');
+        if (active) size = active.textContent;
+    }
+    addToCart(name, price, size);
+}
+
+function updateQty(name, size, delta) {
     let cart = getCart();
-    const idx = cart.findIndex(function(i) { return i.name === name; });
+    const key = name + '||' + (size || 'M');
+    const idx = cart.findIndex(function(i) { return (i.name + '||' + (i.size || 'M')) === key; });
     if (idx === -1) return;
     cart[idx].qty += delta;
     if (cart[idx].qty <= 0) cart.splice(idx, 1);
     saveCart(cart);
 }
 
-function removeFromCart(name) {
-    let cart = getCart().filter(function(i) { return i.name !== name; });
+function removeFromCart(name, size) {
+    const key = name + '||' + (size || 'M');
+    let cart = getCart().filter(function(i) { return (i.name + '||' + (i.size || 'M')) !== key; });
     saveCart(cart);
-    showToast('Eliminado: ' + name);
+    showToast('Eliminado: ' + name + (size ? ' (' + size + ')' : ''));
 }
 
 function updateCartUI() {
@@ -848,7 +864,8 @@ function updateCartUI() {
     }
     footer.style.display = 'block';
     container.innerHTML = cart.map(function(item) {
-        return '<div class="cart-item"><span class="thumb" style="display:flex;align-items:center;justify-content:center;background:#111;border-radius:8px;width:50px;height:60px;font-size:0.6rem;color:#555;text-transform:uppercase;letter-spacing:1px;">BT</span><div class="info"><div class="iname">' + item.name + '</div><div class="iprice">' + item.price + ' EUR</div></div><div class="qty"><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',-1)">-</button><span>' + item.qty + '</span><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',1)">+</button></div><button class="remove-btn" onclick="removeFromCart(\'' + item.name.replace(/'/g, "\\'") + '\')">X</button></div>';
+        var s = item.size || 'M';
+        return '<div class="cart-item"><span class="thumb" style="display:flex;align-items:center;justify-content:center;background:#111;border-radius:8px;width:50px;height:60px;font-size:0.6rem;color:#555;text-transform:uppercase;letter-spacing:1px;">BT</span><div class="info"><div class="iname">' + item.name + '</div><div class="iprice">' + item.price + ' EUR <span style="color:#666;font-size:0.6rem;">(' + s + ')</span></div></div><div class="qty"><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',\'' + s + '\',-1)">-</button><span>' + item.qty + '</span><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',\'' + s + '\',1)">+</button></div><button class="remove-btn" onclick="removeFromCart(\'' + item.name.replace(/'/g, "\\'") + '\',\'' + s + '\')">X</button></div>';
     }).join('');
     const total = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
     document.getElementById('cartTotal').textContent = total + ' EUR';
@@ -865,7 +882,8 @@ function updateOrderCartUI() {
     }
     totalRow.style.display = 'flex';
     container.innerHTML = cart.map(function(item) {
-        return '<div class="cart-row"><span class="cr-name">' + item.name + '</span><span class="cr-price">' + item.price + ' EUR</span><div class="cr-qty"><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',-1)">-</button><span>' + item.qty + '</span><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',1)">+</button></div><button class="cr-del" onclick="removeFromCart(\'' + item.name.replace(/'/g, "\\'") + '\')">X</button></div>';
+        var s = item.size || 'M';
+        return '<div class="cart-row"><span class="cr-name">' + item.name + ' <span style="color:#666;font-size:0.6rem;">(' + s + ')</span></span><span class="cr-price">' + item.price + ' EUR</span><div class="cr-qty"><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',\'' + s + '\',-1)">-</button><span>' + item.qty + '</span><button onclick="updateQty(\'' + item.name.replace(/'/g, "\\'") + '\',\'' + s + '\',1)">+</button></div><button class="cr-del" onclick="removeFromCart(\'' + item.name.replace(/'/g, "\\'") + '\',\'' + s + '\')">X</button></div>';
     }).join('');
     const total = cart.reduce(function(s, i) { return s + i.price * i.qty; }, 0);
     document.getElementById('orderTotal').textContent = total + ' EUR';
@@ -921,7 +939,10 @@ function addExtra() {
     const pName = (num ? '#' + num + ' ' : '') + name;
     const pPrice = parseFloat(price.replace(',', '.'));
     if (isNaN(pPrice)) { showToast('Precio invalido'); return; }
-    addToCart(pName, pPrice);
+    var picker = document.getElementById('efSizePicker');
+    var active = picker ? picker.querySelector('.szc.active') : null;
+    var size = active ? active.textContent : 'M';
+    addToCart(pName, pPrice, size);
     document.getElementById('efNum').value = '';
     document.getElementById('efName').value = '';
     document.getElementById('efPrice').value = '';
@@ -935,18 +956,15 @@ function sendWA() {
     if (cart.length === 0) { showToast('Añade productos al carrito'); return; }
     if (!name) { showToast('Introduce tu nombre'); return; }
 
-    const talla = document.querySelector('input[name="talla"]:checked');
-    const tallaVal = talla ? talla.value : '';
-
     let msg = '*NUEVO PEDIDO - Boutique de Tendencia*\n\n';
     msg += '*Cliente:* ' + name + '\n';
-    if (tallaVal) msg += '*Talla:* ' + tallaVal + '\n';
     if (notes) msg += '*Notas:* ' + notes + '\n';
     msg += '\n*Productos:*\n';
     let total = 0;
     cart.forEach(function(item) {
         const subtotal = item.price * item.qty;
-        msg += '  - ' + item.name + ' x' + item.qty + ' = ' + subtotal + 'EUR\n';
+        const tallaTxt = item.size ? ' [' + item.size + ']' : '';
+        msg += '  - ' + item.name + tallaTxt + ' x' + item.qty + ' = ' + subtotal + 'EUR\n';
         total += subtotal;
     });
     msg += '\n*TOTAL: ' + total + ' EUR*';
@@ -1051,17 +1069,23 @@ function searchProducts(query) {
         { name: "Camiseta Lacoste Negra", price: 45 },
         { name: "Camiseta Entreno Asics", price: 55 }
     ];
+    const SIZES3 = ["XS","S","M","L","XL","XXL"];
     const container = document.getElementById('orderCartItems');
     const quickDiv = document.createElement('div');
     quickDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:0.8rem 0 0.5rem;border-top:1px solid rgba(255,255,255,0.06);';
-    quickDiv.innerHTML = '<div style="width:100%;font-size:0.55rem;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.4rem;">Añadir rapido:</div>';
+    var headerHtml = '<div style="width:100%;font-size:0.55rem;color:#555;text-transform:uppercase;letter-spacing:2px;margin-bottom:0.4rem;">Añadir rapido:</div>';
+    headerHtml += '<div style="width:100%;margin-bottom:6px;" id="quickSizeRow"><span class="sz-picker">';
+    SIZES3.forEach(function(s) { headerHtml += '<span class="szc' + (s === 'M' ? ' active' : '') + '" onclick="document.querySelectorAll(\'#quickSizeRow .szc\').forEach(function(e){e.classList.remove(\'active\')});this.classList.add(\'active\');window.quickSize=\'' + s + '\'">' + s + '</span>'; });
+    headerHtml += '</span></div>';
+    quickDiv.innerHTML = headerHtml;
+    window.quickSize = 'M';
     quickProducts.forEach(function(p) {
         const btn = document.createElement('button');
         btn.textContent = p.name + ' ' + p.price + 'EUR';
         btn.style.cssText = 'background:transparent;border:1px solid #333;color:#aaa;padding:0.3rem 0.7rem;border-radius:50px;font-size:0.55rem;cursor:pointer;font-family:inherit;transition:all 0.2s;';
         btn.onmouseenter = function() { btn.style.borderColor = '#fff'; btn.style.color = '#fff'; };
         btn.onmouseleave = function() { btn.style.borderColor = '#333'; btn.style.color = '#aaa'; };
-        btn.onclick = function() { addToCart(p.name, p.price); };
+        btn.onclick = function() { addToCart(p.name, p.price, window.quickSize || 'M'); };
         quickDiv.appendChild(btn);
     });
     container.parentNode.insertBefore(quickDiv, container);
