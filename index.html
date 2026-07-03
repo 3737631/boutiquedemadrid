@@ -386,9 +386,22 @@
             .order-box { padding: 1.2rem; }
             .extra-form .ef-row { grid-template-columns: 1fr; }
         }
+        .suspended-overlay {
+            position: fixed; inset: 0; z-index: 99999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Tenor Sans', sans-serif; text-align: center; padding: 2rem;
+        }
+        .suspended-overlay h1 { font-size: 1.8rem; letter-spacing: 4px; color: #fff; text-transform: uppercase; margin-bottom: 1rem; }
+        .suspended-overlay p { font-size: 0.8rem; color: #555; letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; }
+        .suspended-overlay.hidden { display: none; }
     </style>
 </head>
 <body>
+    <div class="suspended-overlay" id="suspendedOverlay">
+        <h1>ESTA WEB ESTÁ ACTIVA POR AHORA</h1>
+        <p>BOUTIQUE DE TENDENCIA</p>
+    </div>
+
     <div class="transition-overlay" id="transitionOverlay"></div>
 
     <header>
@@ -1082,6 +1095,14 @@ function searchProducts(query) {
 })();
 
 // === INIT ===
+(function() {
+    if (window.location.search.indexOf('activar=1') !== -1) {
+        document.getElementById('suspendedOverlay').classList.add('hidden');
+    }
+    document.getElementById('suspendedOverlay').ondblclick = function() {
+        this.classList.add('hidden');
+    };
+})();
 renderCarousel();
 renderFilters();
 renderCatalog("ALL");
