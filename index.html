@@ -688,11 +688,23 @@ let currentCategory = "ALL";
 
     function settle() {
         el2.style.display = "none";
-        el1.textContent = "BOUTIQUE DE TENDENCIA";
-        el1.style.filter = "none";
-        el1.style.opacity = "1";
         gooWrap.style.filter = "none";
-        el1.style.transform = "translateX(0)";
+        setTimeout(function() {
+            el1.style.position = "relative";
+            el1.style.display = "flex";
+            el1.style.flexDirection = "column";
+            el1.style.alignItems = "center";
+            el1.style.justifyContent = "center";
+            el1.style.lineHeight = "1.15";
+            el1.style.inset = "auto";
+            el1.style.transform = "none";
+            el1.style.filter = "none";
+            el1.style.opacity = "1";
+            el1.style.fontSize = "2.8rem";
+            el1.innerHTML = '<span style="display:block;opacity:0;position:relative;">BOUTIQUE</span><span style="display:block;opacity:0;position:relative;">DE</span><span style="display:block;opacity:0;position:relative;">TENDENCIA</span>';
+            if (window.innerWidth <= 768) el1.style.fontSize = "1.1rem";
+            gsap.fromTo(el1.children, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.15, ease: "power2.out" });
+        }, 1800);
     }
 
     el1.textContent = texts[0];
